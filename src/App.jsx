@@ -1,121 +1,67 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useState, useMemo } from 'react'
+import { useEntries } from './hooks/useEntries'
+import { EntryForm } from './components/EntryForm'
+import { EntryList } from './components/EntryList'
+import { SearchBar } from './components/SearchBar'
+import { LoadingSpinner } from './components/LoadingSpinner'
+import { ErrorMessage } from './components/ErrorMessage'
+import './styles/base.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+export function App() {
+  const { entries, loading, error, add, remove, retry } = useEntries()
+  const [searchQuery, setSearchQuery] = useState('')
+
+  // Filter entries based on search input
+  const filteredEntries = useMemo(() => {
+    if (!searchQuery.trim()) return entries
+    const q = searchQuery.toLowerCase()
+    return entries.filter(
+      (entry) =>
+        entry.name?.toLowerCase().includes(q) ||
+        entry.metric?.toLowerCase().includes(q) ||
+        entry.notes?.toLowerCase().includes(q)
+    )
+  }, [entries, searchQuery])
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="container">
+      <header style={{ marginBottom: 'var(--space-32)' }}>
+        <h1 style={{ marginBottom: 'var(--space-8)' }}>
+          Performance Optimization Tracker
+        </h1>
+        <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
+          Monitor, record, and track web performance metrics across releases.
+        </p>
+      </header>
 
-      <div className="ticks"></div>
+      <main>
+        {/* Entry form placed first to preserve accessible tab order */}
+        <section className="form-section">
+          <EntryForm onAdd={add} />
+        </section>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        {/* Search filter bar */}
+        <section className="search-section">
+          <SearchBar value={searchQuery} onChange={setSearchQuery} />
+        </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+        {/* Status / Error feedback */}
+        {error && <ErrorMessage message={error} onRetry={retry} />}
+
+        {/* Entries display section */}
+        <section className="entries-section" style={{ marginTop: 'var(--space-16)' }}>
+          <h2 style={{ fontSize: 'var(--font-lg)' }}>
+            Entries
+          </h2>
+
+          {loading ? (
+            <LoadingSpinner />
+          ) : (
+            <EntryList entries={filteredEntries} onDelete={remove} />
+          )}
+        </section>
+      </main>
+    </div>
   )
 }
 
