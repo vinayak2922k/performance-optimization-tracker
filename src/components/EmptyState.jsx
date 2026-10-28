@@ -4,6 +4,7 @@
 export function EmptyState({ message = 'No data found' }) {
   return (
     <div
+      aria-live="polite"
       className="empty-state"
       style={{
         textAlign: 'center',

@@ -1,11 +1,13 @@
+import { memo } from 'react'
 import { EmptyState } from './EmptyState'
 
 /**
  * EntryList component rendering tabular entries or an EmptyState placeholder.
+ * Wrapped in React.memo to skip re-rendering when entries and onDelete are unchanged.
  *
  * @param {{ entries: Array<object>, onDelete?: (id: string|number) => void }} props
  */
-export function EntryList({ entries = [], onDelete }) {
+export const EntryList = memo(function EntryList({ entries = [], onDelete }) {
   if (!entries || entries.length === 0) {
     return <EmptyState message="No data found" />
   }
@@ -13,6 +15,7 @@ export function EntryList({ entries = [], onDelete }) {
   return (
     <div className="entry-list-container" style={{ overflowX: 'auto' }}>
       <table aria-label="Performance Optimization Entries">
+        <caption className="sr-only">Performance Optimization Entries</caption>
         <thead>
           <tr>
             <th scope="col">Name</th>
@@ -63,6 +66,6 @@ export function EntryList({ entries = [], onDelete }) {
       </table>
     </div>
   )
-}
+})
 
 export default EntryList

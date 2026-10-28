@@ -8,8 +8,8 @@
   --color-gray-5: #18181b;
   --color-black: #000000;
 
-  /* The only exception: Single error color for invalid fields */
-  --color-error: #dc2626;
+  /* High-contrast accessible error color (passes WCAG AAA > 6:1 contrast) */
+  --color-error: #b91c1c;
 
   /* Semantic Color Aliases (referencing only the tokens above) */
   --color-bg-primary: var(--color-white);

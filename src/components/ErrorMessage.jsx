@@ -14,6 +14,7 @@ export function ErrorMessage({ message = 'Failed to load entries', onRetry }) {
   return (
     <div
       role="alert"
+      aria-live="assertive"
       className="error-state"
       style={{
         padding: 'var(--space-16)',
@@ -35,6 +36,7 @@ export function ErrorMessage({ message = 'Failed to load entries', onRetry }) {
         <button
           type="button"
           onClick={onRetry}
+          aria-label="Retry loading performance entries"
           style={{
             borderColor: 'var(--color-error)',
             color: 'var(--color-error)',

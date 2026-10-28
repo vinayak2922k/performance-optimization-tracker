@@ -1,24 +1,32 @@
-import { useState } from 'react'
+import { useState, useRef, memo } from 'react'
 import { sanitizeInput } from '../utils/sanitizeInput'
 import { validateEntry } from '../utils/validateEntry'
 
 /**
  * EntryForm component allowing users to add performance optimization tracker records.
+ * Wrapped in React.memo to prevent re-rendering on parent updates (e.g. typing in search).
  *
  * Enforces:
  * - Sanitizing inputs before updating state.
  * - Field-level validation on submission.
  * - aria-invalid and aria-describedby for accessible error linkage.
+ * - Focus management on validation failure and successful submit.
+ * - Live region feedback for assistive technologies.
  * - Logging analytics event on successful creation.
  *
  * @param {{ onAdd: (entry: object) => void }} props
  */
-export function EntryForm({ onAdd }) {
+export const EntryForm = memo(function EntryForm({ onAdd }) {
   const [name, setName] = useState('')
   const [metric, setMetric] = useState('')
   const [score, setScore] = useState('')
   const [notes, setNotes] = useState('')
   const [errors, setErrors] = useState({})
+  const [statusMessage, setStatusMessage] = useState('')
+
+  const nameInputRef = useRef(null)
+  const metricInputRef = useRef(null)
+  const scoreInputRef = useRef(null)
 
   const handleNameChange = (e) => {
     // Sanitize input before state while preserving whitespace during typing
@@ -71,6 +79,14 @@ export function EntryForm({ onAdd }) {
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors)
+      // Focus the first invalid field for seamless keyboard accessibility
+      if (validationErrors.name) {
+        nameInputRef.current?.focus()
+      } else if (validationErrors.metric) {
+        metricInputRef.current?.focus()
+      } else if (validationErrors.score) {
+        scoreInputRef.current?.focus()
+      }
       return
     }
 
@@ -93,6 +109,10 @@ export function EntryForm({ onAdd }) {
     setMetric('')
     setScore('')
     setNotes('')
+    setStatusMessage(`Entry "${newEntry.name}" added successfully.`)
+
+    // Focus management: return focus to the first form input after submission
+    nameInputRef.current?.focus()
   }
 
   return (
@@ -115,6 +135,13 @@ export function EntryForm({ onAdd }) {
         Add Optimization Entry
       </h2>
 
+      {/* Accessible Live Feedback Announcement */}
+      {statusMessage && (
+        <div role="status" aria-live="polite" className="sr-only">
+          {statusMessage}
+        </div>
+      )}
+
       {/* Name Field */}
       <div className="form-group">
         <label
@@ -130,6 +157,7 @@ export function EntryForm({ onAdd }) {
           Name
         </label>
         <input
+          ref={nameInputRef}
           id="entry-name"
           name="name"
           type="text"
@@ -161,6 +189,7 @@ export function EntryForm({ onAdd }) {
           Metric
         </label>
         <input
+          ref={metricInputRef}
           id="entry-metric"
           name="metric"
           type="text"
@@ -192,6 +221,7 @@ export function EntryForm({ onAdd }) {
           Score (0-100)
         </label>
         <input
+          ref={scoreInputRef}
           id="entry-score"
           name="score"
           type="text"
@@ -253,6 +283,6 @@ export function EntryForm({ onAdd }) {
       </button>
     </form>
   )
-}
+})
 
 export default EntryForm

@@ -37,6 +37,7 @@ export function SearchBar({ value, onChange }) {
         placeholder="Search entries..."
         value={value}
         onChange={handleChange}
+        autoComplete="off"
         style={{
           width: '100%',
           boxSizing: 'border-box',

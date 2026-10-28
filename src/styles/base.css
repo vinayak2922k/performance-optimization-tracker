@@ -76,7 +76,42 @@ textarea {
 
 input::placeholder,
 textarea::placeholder {
-  color: var(--color-gray-3);
+  color: var(--color-gray-4);
+}
+
+/* Screen Reader Only Accessible Utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Accessible Skip Link */
+.skip-link {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  background: var(--color-text-contrast);
+  color: var(--color-white);
+  padding: var(--space-8) var(--space-16);
+  border-radius: var(--radius-sm);
+  z-index: 1000;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  top: var(--space-16);
+  left: var(--space-16);
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
 input:hover,
